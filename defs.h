@@ -56,6 +56,16 @@ void            ideinit(void);
 void            ideintr(void);
 void            iderw(struct buf*);
 
+// pci.c
+void            pciwrite(ushort addr, uchar reg, uint data);
+uint            pciread(ushort addr, uchar reg);
+void            soundinit(void);
+
+// audio.c
+void            soundcardinit(ushort addr);
+void            soundInterrupt(void);
+void            setSoundSampleRate(uint samplerate);
+
 // ioapic.c
 void            ioapicenable(int irq, int cpu);
 extern uchar    ioapicid;

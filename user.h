@@ -22,6 +22,10 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
+int writeaudio(void*, int);
+int setSampleRate(int);
+int pause();
+int mp3decode();
 
 // ulib.c
 int stat(char*, struct stat*);

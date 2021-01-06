@@ -98,6 +98,11 @@ extern int sys_unlink(void);
 extern int sys_wait(void);
 extern int sys_write(void);
 extern int sys_uptime(void);
+extern int sys_writeaudio(void);
+extern int sys_setSampleRate(void);
+extern int sys_setVolume(void);
+extern int sys_pause(void);
+extern int sys_mp3decode(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -121,6 +126,11 @@ static int (*syscalls[])(void) = {
 [SYS_link]    sys_link,
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
+[SYS_writeaudio] sys_writeaudio,
+[SYS_setSampleRate] sys_setSampleRate,
+[SYS_setVolume] sys_setVolume,
+[SYS_pause] sys_pause,
+[SYS_mp3decode] sys_mp3decode,
 };
 
 void

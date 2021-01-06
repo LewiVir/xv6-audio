@@ -33,6 +33,7 @@ main(void)
   fileinit();      // file table
   iinit();         // inode cache
   ideinit();       // disk
+  soundinit();     // audio
   if(!ismp)
     timerinit();   // uniprocessor timer
   startothers();   // start other processors

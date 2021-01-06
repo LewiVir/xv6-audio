@@ -20,3 +20,8 @@
 #define SYS_link   19
 #define SYS_mkdir  20
 #define SYS_close  21
+#define SYS_setSampleRate 22
+#define SYS_writeaudio 23
+#define SYS_setVolume 24
+#define SYS_pause 25
+#define SYS_mp3decode 26
