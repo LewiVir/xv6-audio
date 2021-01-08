@@ -36,7 +36,12 @@ main(int argc, char *argv[])
     close(fd);
     exit();
   }
-
+  
+  int pid = fork();
+  if (pid == 0) {
+	  exec("sh",argv);
+  }
+  
   setaudiosmprate(info.info.sample_rate);
   uint rd = 0;
   char buf[2049];
@@ -44,7 +49,7 @@ main(int argc, char *argv[])
   while (rd < info.dlen)
   {
     read(fd, buf, (info.dlen - rd < 2048 ? info.dlen -rd : 2048));
-    printf(0, "%d %d\n", rd, info.dlen);
+    //printf(0, "%d %d\n", rd, info.dlen);
     writeaudio(buf, (info.dlen - rd < 2048 ? info.dlen -rd : 2048));
     rd += (info.dlen - rd < 2048 ? info.dlen -rd : 2048);
   }
@@ -56,6 +61,9 @@ main(int argc, char *argv[])
   }
 
   close(fd);
+
+  kill(pid);
+  wait();
 
   exit();
 }

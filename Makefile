@@ -177,6 +177,8 @@ UPROGS=\
 	_wc\
 	_zombie\
 	_play\
+	_pause\
+	_setvolume\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS) tsinghua.wav

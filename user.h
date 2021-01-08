@@ -25,6 +25,7 @@ int uptime(void);
 int writeaudio(void*, int);
 int setaudiosmprate(int);
 int setaudiovolume(int);
+int audiopause(void);
 
 // ulib.c
 int stat(char*, struct stat*);
