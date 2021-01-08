@@ -183,7 +183,7 @@ UPROGS=\
 	_mp3dec\
 
 fs.img: mkfs README $(UPROGS)
-	./mkfs fs.img README $(UPROGS) tsinghua.wav
+	./mkfs fs.img README $(UPROGS) tsinghua.wav tsinghua.mp3
 
 -include *.d
 

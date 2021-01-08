@@ -46,7 +46,22 @@ trap(struct trapframe *tf)
     return;
   }
 
+  uchar *mem;
+
   switch(tf->trapno){
+    case T_PGFLT: 
+    // In user space, assume process misbehaved.
+    // kalloc或mappages执行失败，则继续执行下面的default.
+    // cr2包含发生页面错误时的线性地址.
+    mem = kalloc();
+    if(mem != 0){
+      uint va = PGROUNDDOWN(rcr2());
+      memset(mem, 0, PGSIZE);
+      extern int mappages(pde_t *pgdir, void *va, uint size, uint pa, int perm);
+      if(mappages(proc->pgdir,(void *)va, PGSIZE, V2P(mem), PTE_W|PTE_U) >= 0) {
+          break;	
+      }
+    }
   case T_IRQ0 + IRQ_TIMER:
     if(cpu->id == 0){
       acquire(&tickslock);
