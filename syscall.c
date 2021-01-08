@@ -98,6 +98,14 @@ extern int sys_unlink(void);
 extern int sys_wait(void);
 extern int sys_write(void);
 extern int sys_uptime(void);
+extern int sys_kwrite(void);
+extern int sys_setSampleRate(void);
+extern int sys_pause(void);
+extern int sys_wavdecode(void);
+extern int sys_waitForDecode(void);
+extern int sys_beginDecode(void);
+extern int sys_endDecode(void);
+extern int sys_getCoreBuf(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -121,6 +129,14 @@ static int (*syscalls[])(void) = {
 [SYS_link]    sys_link,
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
+[SYS_kwrite] sys_kwrite,
+[SYS_setSampleRate] sys_setSampleRate,
+[SYS_pause] sys_pause,
+[SYS_wavdecode] sys_wavdecode,
+[SYS_beginDecode] sys_beginDecode,
+[SYS_waitForDecode] sys_waitForDecode,
+[SYS_endDecode] sys_endDecode,
+[SYS_getCoreBuf] sys_getCoreBuf,
 };
 
 void
