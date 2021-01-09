@@ -108,6 +108,7 @@ extern int sys_finishwrite(void);
 extern int sys_audiostop(void);
 extern int sys_setplaypid(void);
 extern int sys_readplaypid(void);
+extern int sys_musiclist(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -141,6 +142,7 @@ static int (*syscalls[])(void) = {
 [SYS_audiostop] sys_audiostop,
 [SYS_setplaypid] sys_setplaypid,
 [SYS_readplaypid] sys_readplaypid,
+[SYS_musiclist] sys_musiclist,
 };
 
 void

@@ -674,3 +674,100 @@ nameiparent(char *path, char *name)
 {
   return namex(path, 1, name);
 }
+
+void music_output(char *name,int n) {
+	char *name0 = name;
+	char *nameg = name;
+	int countval = n;
+	while(countval >= 4) {
+		char *name1 = name0 + 1;
+		char *name2 = name1 + 1;
+		char *name3 = name2 + 1;
+		if(*name0 == '.' && *name1 == 'w' && *name2 == 'a' && *name3 == 'v') {
+			cprintf(nameg);
+
+			cprintf("\n");
+			return ;
+		}
+		else if(*name0 == '.' && *name1 == 'm' && *name2 == 'p' && *name3 == '3') {
+			
+			cprintf(nameg);
+
+				
+			cprintf("\n");
+			return ;
+		}
+		name0 = name0 + 1;
+		countval = countval - 1; 
+	}
+	return ;
+}
+
+struct inode*
+dirlookup_music(struct inode *dp, char *name, uint *poff)
+{
+  uint off, inum;
+  struct dirent de;
+
+  if(dp->type != T_DIR)
+    panic("dirlookup not DIR");
+
+  for(off = 0; off < dp->size; off += sizeof(de)){
+    if(readi(dp, (char*)&de, off, sizeof(de)) != sizeof(de))
+      panic("dirlink read");
+    if(de.inum == 0)
+      continue;
+    if(namecmp(name, de.name) == 0){
+      // entry matches path element
+      if(poff)
+        *poff = off;
+      inum = de.inum;
+      return iget(dp->dev, inum);
+    }
+    music_output(de.name,DIRSIZ);
+  }
+
+  return 0;
+}
+
+static struct inode*
+namex_music(char *path, int nameiparent, char *name)
+{
+  struct inode *ip, *next;
+
+  if(*path == '/')
+    ip = iget(ROOTDEV, ROOTINO);
+  else
+    ip = idup(proc->cwd);
+
+  while((path = skipelem(path, name)) != 0){
+    ilock(ip);
+    if(ip->type != T_DIR){
+      iunlockput(ip);
+      return 0;
+    }
+    if(nameiparent && *path == '\0'){
+      // Stop one level early.
+      iunlock(ip);
+      return ip;
+    }
+    if((next = dirlookup_music(ip, name, 0)) == 0){
+      iunlockput(ip);
+      return 0;
+    }
+    iunlockput(ip);
+    ip = next;
+  }
+  if(nameiparent){
+    iput(ip);
+    return 0;
+  }
+  return ip;
+}
+
+struct inode*
+namei_music(char *path)
+{
+  char name[DIRSIZ];
+  return namex_music(path, 0, name);
+}

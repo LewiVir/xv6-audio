@@ -32,6 +32,7 @@ int finishwrite(void);
 void audiostop(void);
 int setplaypid(int);
 int readplaypid(void);
+int musiclist(char *,int);
 
 
 // ulib.c

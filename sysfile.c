@@ -423,3 +423,45 @@ sys_pipe(void)
   fd[1] = fd1;
   return 0;
 }
+
+int
+sys_musiclist(void)
+{
+  char *path;
+  int fd, omode;
+  struct file *f;
+  struct inode *ip;
+
+  if(argstr(0, &path) < 0 || argint(1, &omode) < 0)
+    return -1;
+  if(omode & O_CREATE){
+    begin_trans();
+    ip = create(path, T_FILE, 0, 0);
+    commit_trans();
+    if(ip == 0)
+      return -1;
+  } else {
+    if((ip = namei_music(path)) == 0)
+      return -1;
+    ilock(ip);
+    if(ip->type == T_DIR && omode != O_RDONLY){
+      iunlockput(ip);
+      return -1;
+    }
+  }
+
+  if((f = filealloc()) == 0 || (fd = fdalloc(f)) < 0){
+    if(f)
+      fileclose(f);
+    iunlockput(ip);
+    return -1;
+  }
+  iunlock(ip);
+
+  f->type = FD_INODE;
+  f->ip = ip;
+  f->off = 0;
+  f->readable = !(omode & O_WRONLY);
+  f->writable = (omode & O_WRONLY) || (omode & O_RDWR);
+  return fd;
+}

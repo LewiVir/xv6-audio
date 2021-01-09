@@ -30,3 +30,4 @@
 #define SYS_audiostop 29
 #define SYS_setplaypid 30
 #define SYS_readplaypid 31
+#define SYS_musiclist 32
