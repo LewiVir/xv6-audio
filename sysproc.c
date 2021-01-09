@@ -35,10 +35,45 @@ sys_kill(void)
   return kill(pid);
 }
 
-int
-sys_getpid(void)
-{
+int sys_getpid(void){
   return proc->pid;
+}
+
+int sys_getppid(void){
+  return proc->parent->pid;
+}
+
+//Processes || Copy elements from the kernel ptable to the user space
+extern struct proc * getptable_proc(void);
+
+int sys_getptable(void){
+  int size;
+  char *buf;
+  char *s;
+  struct proc *p = '\0';
+  
+  if (argint(0, &size) <0){
+    return -1;
+  }
+  if (argptr(1, &buf,size) <0){
+    return -1;
+  }
+  
+  s = buf;
+  p = getptable_proc();
+  
+  while(buf + size > s && p->state != UNUSED){
+    *(int *)s = p->state;
+    s+=4;
+    *(int *)s = p -> pid;
+    s+=4;
+    *(int *)s = p->parent->pid;
+    s+=4;
+    memmove(s,p->name,16);
+    s+=16;
+    p++;
+  } 
+  return 0;
 }
 
 int

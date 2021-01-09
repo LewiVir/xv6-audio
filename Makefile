@@ -179,9 +179,10 @@ UPROGS=\
 	_play\
 	_pause\
 	_setvolume\
+	_ps\
 
 fs.img: mkfs README $(UPROGS)
-	./mkfs fs.img README $(UPROGS) tsinghua.wav
+	./mkfs fs.img README $(UPROGS) tsinghua.wav twilight.wav
 
 -include *.d
 

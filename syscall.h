@@ -24,3 +24,6 @@
 #define SYS_writeaudio 23
 #define SYS_setaudiovolume 24
 #define SYS_audiopause 25
+#define SYS_getppid 26
+#define SYS_getptable 27
+#define SYS_finishwrite 28

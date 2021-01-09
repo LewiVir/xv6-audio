@@ -102,6 +102,9 @@ extern int sys_writeaudio(void);
 extern int sys_setaudiosmprate(void);
 extern int sys_setaudiovolume(void);
 extern int sys_audiopause(void);
+extern int sys_getppid(void);
+extern int sys_getptable(void);
+extern int sys_finishwrite(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -129,6 +132,9 @@ static int (*syscalls[])(void) = {
 [SYS_writeaudio] sys_writeaudio,
 [SYS_setaudiovolume] sys_setaudiovolume,
 [SYS_audiopause] sys_audiopause,
+[SYS_getppid] sys_getppid,
+[SYS_getptable] sys_getptable,
+[SYS_finishwrite] sys_finishwrite,
 };
 
 void

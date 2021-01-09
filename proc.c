@@ -456,4 +456,7 @@ procdump(void)
   }
 }
 
-
+//Syscall getptable
+struct proc * getptable_proc(void){
+  return ptable.proc;
+}

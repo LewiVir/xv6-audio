@@ -7,7 +7,7 @@
 int
 main(int argc, char *argv[])
 {
-  int i;
+  //int i;
   int fd;
 
   struct wav info;
@@ -38,32 +38,38 @@ main(int argc, char *argv[])
   }
   
   int pid = fork();
-  if (pid == 0) {
-	  exec("sh",argv);
+  if (pid != 0) {//father exit, child continue
+    //exec("sh",argv);
+    exit();
   }
-  
+
   setaudiosmprate(info.info.sample_rate);
   uint rd = 0;
   char buf[2049];
-
-  while (rd < info.dlen)
-  {
+  /*
+  printf(0, "proc %d is doing preparation work...\n", getpid());
+  memset(buf, 0, 2048);
+  for (i = 0; i < DMA_BUF_NUM * DMA_BUF_SIZE/2048+1; i++){
+    writeaudio(buf, 2048);
+  }*/
+  printf(0, "proc %d is playing...\n", getpid());
+  while (rd < info.dlen){
     read(fd, buf, (info.dlen - rd < 2048 ? info.dlen -rd : 2048));
-    //printf(0, "%d %d\n", rd, info.dlen);
+    //printf(0, "read pointer: %d, tot_len: %d\n", rd, info.dlen);
     writeaudio(buf, (info.dlen - rd < 2048 ? info.dlen -rd : 2048));
     rd += (info.dlen - rd < 2048 ? info.dlen -rd : 2048);
   }
-
-  memset(buf, 0, 2048);
-  for (i = 0; i < DMA_BUF_NUM*DMA_BUF_SIZE/2048+1; i++)
-  {
+  finishwrite();
+  /*
+  memset(buf, 0, 2048);//this part is important! To make the last node sent to addSound!!!
+  printf(0, "writing 0...\n");
+  for (i = 0; i < DMA_BUF_NUM * DMA_BUF_SIZE/2048+1; i++){
     writeaudio(buf, 2048);
-  }
-
+  }*/
+  printf(0, "proc %d finish playing...\n", getpid());
   close(fd);
 
-  kill(pid);
-  wait();
+  //kill(pid);  wait();
 
   exit();
 }

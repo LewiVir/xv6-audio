@@ -40,7 +40,7 @@ ushort SOUND_NABMBA_DATA;
 #define MC_CR SOUND_NABMBA_DATA + 0x2B//Mic. In Control Register
 
 static struct spinlock soundLock;
-static struct soundNode *soundQueue;
+static struct soundNode *soundQueue;//a queue consists of soundNodes
 
 struct descriptor
 {
@@ -189,23 +189,22 @@ void setVolume(ushort volume)
 }
 
 //add sound-piece to the end of queue
-void addSound(struct soundNode *node)
+void addSound(struct soundNode *node)//param is a pointer to soundNode
 {   
     cprintf("addSound\n");
     struct soundNode **ptr;
 
     acquire(&soundLock);
 
-    node->next = 0;
-    for(ptr = &soundQueue; *ptr; ptr = &(*ptr)->next)
+    node->next = 0;//because it is going to be added to the end of soundQueue
+    for(ptr = &soundQueue; *ptr; ptr = &(*ptr)->next)//locate ptr to the last node of soundQueue
         ;
-    *ptr = node;
+    *ptr = node;//make node linked to the end
 
-
-    //node is already the first
+    //node is already the first (i.e., soundQueue=0x00)
     //play sound
-    if (soundQueue == node)
-    {
+    if (soundQueue == node){
+        cprintf("addSound: soundQueue == node, so playSound()\n");
         playSound();
     }
 
@@ -219,8 +218,7 @@ void playSound(void)
 
     //遍历声卡DMA的描述符列表，初始化每一个描述符buf指向缓冲队列中第一个音乐的数据块
     //每个数据块大小: DMA_BUF_SIZE
-    for (i = 0; i < DMA_BUF_NUM; i++)
-    {
+    for (i = 0; i < DMA_BUF_NUM; i++){
         descriTable[i].buf = v2p(soundQueue->data) + i * DMA_BUF_SIZE;
         descriTable[i].cmd_len = 0x80000000 + DMA_SMP_NUM;
     }
@@ -228,12 +226,10 @@ void playSound(void)
     uint base = v2p(descriTable);
 
     //开始播放: PCM_OUT
-    if ((soundQueue->flag & PCM_OUT) == PCM_OUT)
-    {
+    if ((soundQueue->flag & PCM_OUT) == PCM_OUT){
         cprintf("PCM_OUT\n");
         //init base register
-        //将内存地址base开始的1个双字写到PO_BDBAR
-        outsl(PO_BDBAR, &base, 1);
+        outsl(PO_BDBAR, &base, 1); //将内存地址base开始的1个双字写到PO_BDBAR
         //init last valid index
         outb(PO_LVI, 0x1F);
         //init control register
@@ -241,14 +237,11 @@ void playSound(void)
         //enable interrupt
         outb(PO_CR, 0x05);
     }
-
     //开始录音: Mic_IN
-    else if ((soundQueue->flag & PCM_IN) == PCM_IN)
-    {
+    else if ((soundQueue->flag & PCM_IN) == PCM_IN) {//i.e., soundQueue->flag == PCM_IN
         cprintf("PCM_IN\n");
         //init register
-        //将内存地址base开始的1个双字写到PO_BDBAR
-        outsl(MC_BDBAR, &base, 1);
+        outsl(MC_BDBAR, &base, 1); //将内存地址base开始的1个双字写到PO_BDBAR
         //init last valid index
         outb(MC_LVI, 0x1F);
         //init control register
@@ -256,61 +249,52 @@ void playSound(void)
         //enable interrupt
         outb(MC_CR, 0x05);
     }
-
 }
 
 void soundInterrupt(void)
 {
-    cprintf("soundInter\n");
+    cprintf("soundInterrupt\n");//once a soundNode finish playing, send an interrupt to CPU
     int i;
 
     acquire(&soundLock);
 
-    struct soundNode *node = soundQueue;
-    soundQueue = node->next;
+    struct soundNode *node = soundQueue;//points to the header of soundQueue
+    soundQueue = node->next;//soundQueue move down for one node
 
     //flag
-    int flag = node->flag;
+    int flag = node->flag;//get the flag of the original header node
 
-    node->flag |= PROCESSED;
-
-    //0 sound file left
-    if (soundQueue == 0)
-    {
-        if ((flag & PCM_OUT) == PCM_OUT)
-        {
+    //node->flag |= PROCESSED;//turn the flag to PROCESSED?
+    node->flag = AVAILABLE;//return it as usable
+    
+    if (soundQueue == 0) {//0 sound file left
+        if ((flag & PCM_OUT) == PCM_OUT){
             //????
             ushort sr = inw(PO_SR);
             outw(PO_SR, sr);
         }
-        else if ((flag & PCM_IN) == PCM_IN)
-        {
+        else if ((flag & PCM_IN) == PCM_IN){
             ushort sr = inw(MC_SR);
             outw(MC_SR, sr);
         }
-        cprintf("Play Done\n");
+        cprintf("soundQueue empty.\n");//cprintf("Play Done\n");
         release(&soundLock);
         return;
     }
 
     //descriptor table buffer
-    for (i = 0; i < DMA_BUF_NUM; i++)
-    {
+    for (i = 0; i < DMA_BUF_NUM; i++){
         descriTable[i].buf = v2p(soundQueue->data) + i * DMA_BUF_SIZE;
         descriTable[i].cmd_len = 0x80000000 + DMA_SMP_NUM;
     }
 
-    //play music
-    if ((flag & PCM_OUT) == PCM_OUT)
-    {
+    
+    if ((flag & PCM_OUT) == PCM_OUT) {//play music
         ushort sr = inw(PO_SR);
         outw(PO_SR, sr);
         outb(PO_CR, 0x05);
     }
-
-    //record
-    else if ((flag & PCM_IN) == PCM_IN)
-    {
+    else if ((flag & PCM_IN) == PCM_IN) { //record
         ushort sr = inw(MC_SR);
         outw(MC_SR, sr);
         outb(MC_CR, 0x05);
@@ -327,17 +311,17 @@ void pauseSound(void)
 
     if (temp != 0x00)
         outb(PO_CR, 0x00);
-    else
-        outb(PO_CR, 0x05);
+    else    //temp == 0x00 means current state is stopped
+        outb(PO_CR, 0x05);//make it start again
 }
 
 void setSoundSampleRate(uint samplerate)
 {
     cprintf("setSoundSampleRate\n");
-    //Control Register --> 0x00
+    
     //pause audio
     //disable interrupt
-    outb(PO_CR, 0x00);
+    outb(PO_CR, 0x00);//Control Register --> 0x00
 
     //PCM Front DAC Rate
     outw(FRONT_DAC_RATE, samplerate & 0xFFFF);

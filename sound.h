@@ -21,11 +21,14 @@
 #define PCM_OUT 0x2
 #define PCM_IN 0x4
 
+#define AVAILABLE 0x8
+#define SENT      0x16
+
 struct soundNode
 {
 	volatile int flag;
 	struct soundNode *next;
-	uchar data[DMA_BUF_NUM * DMA_BUF_SIZE];
+	uchar data[DMA_BUF_NUM * DMA_BUF_SIZE];//32 * 2 * 0x3000 = 786432
 };
 
 struct fmt {

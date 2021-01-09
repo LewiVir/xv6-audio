@@ -26,6 +26,10 @@ int writeaudio(void*, int);
 int setaudiosmprate(int);
 int setaudiovolume(int);
 int audiopause(void);
+int getppid(void);
+int getptable(int, void*);
+int finishwrite(void);
+
 
 // ulib.c
 int stat(char*, struct stat*);
