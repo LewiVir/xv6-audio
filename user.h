@@ -29,6 +29,9 @@ int audiopause(void);
 int getppid(void);
 int getptable(int, void*);
 int finishwrite(void);
+void audiostop(void);
+int setplaypid(int);
+int readplaypid(void);
 
 
 // ulib.c

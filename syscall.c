@@ -105,6 +105,9 @@ extern int sys_audiopause(void);
 extern int sys_getppid(void);
 extern int sys_getptable(void);
 extern int sys_finishwrite(void);
+extern int sys_audiostop(void);
+extern int sys_setplaypid(void);
+extern int sys_readplaypid(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -135,6 +138,9 @@ static int (*syscalls[])(void) = {
 [SYS_getppid] sys_getppid,
 [SYS_getptable] sys_getptable,
 [SYS_finishwrite] sys_finishwrite,
+[SYS_audiostop] sys_audiostop,
+[SYS_setplaypid] sys_setplaypid,
+[SYS_readplaypid] sys_readplaypid,
 };
 
 void

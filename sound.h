@@ -14,7 +14,7 @@
 #define PCI_CONFIG
 
 #define DMA_BUF_NUM  32
-#define DMA_SMP_NUM  0x3000
+#define DMA_SMP_NUM  0x0100
 #define DMA_BUF_SIZE (DMA_SMP_NUM * 2)
 
 #define PROCESSED  0x1
@@ -60,3 +60,4 @@ void playSound(void);
 void soundInterrupt(void);
 void pauseSound(void);
 void setSoundSampleRate(uint samplerate);
+void clearSound(void);

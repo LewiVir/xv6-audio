@@ -11,10 +11,29 @@ struct soundNode audiobuf[3];
 int bufcount;
 int datacount;//currently occupied count
 
+static int cur_pid = 0;
+
+int sys_setplaypid(void){
+    int pid;
+    argint(0, &pid);
+    // cprintf("setting play_pid as %d\n", pid);
+    cur_pid = pid;
+    return 0;
+}
+
+int sys_readplaypid(void){
+    // cprintf("current play_pid is %d\n", cur_pid);
+    return cur_pid;
+}
+
+void sys_audiostop(void){
+    clearSound();
+}
+
 int
 sys_setaudiosmprate(void)
 {
-	cprintf("sys_setaudiosmprate\n");
+	// cprintf("sys_setaudiosmprate\n");
     int rate, i;
     //获取系统的第0个参数
     if (argint(0, &rate) < 0)
@@ -35,7 +54,7 @@ sys_setaudiosmprate(void)
 
 int sys_setaudiovolume(void)
 {
-	cprintf("sys_setaudiovolume\n");
+	// cprintf("sys_setaudiovolume\n");
     int n;
     ushort volume;
 
@@ -44,7 +63,7 @@ int sys_setaudiovolume(void)
 
     volume = ((n & 0x3F) << 8) + (n & 0x3F);
 
-    cprintf("id");
+    // cprintf("id");
 
     //audio.c设置音量
     setVolume(volume);

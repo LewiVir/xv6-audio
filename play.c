@@ -7,10 +7,24 @@
 int
 main(int argc, char *argv[])
 {
-  //int i;
-  int fd;
-
+  int fd, my_pid, running_pid;
   struct wav info;
+
+  int pid = fork();
+  if (pid != 0) {  // father exit, child continue
+    // exec("sh",argv);
+    exit();
+  }
+
+  my_pid = getpid();
+  running_pid = readplaypid();
+  if (my_pid != running_pid && running_pid != 0) {
+    // printf(0, "killing proc %d\n", my_pid);
+    kill(running_pid);
+    audiostop();
+  }
+
+  setplaypid(my_pid);
 
   fd = open(argv[1], O_RDWR);
   if (fd < 0)
@@ -36,12 +50,6 @@ main(int argc, char *argv[])
     close(fd);
     exit();
   }
-  
-  int pid = fork();
-  if (pid != 0) {//father exit, child continue
-    //exec("sh",argv);
-    exit();
-  }
 
   setaudiosmprate(info.info.sample_rate);
   uint rd = 0;
@@ -52,10 +60,10 @@ main(int argc, char *argv[])
   for (i = 0; i < DMA_BUF_NUM * DMA_BUF_SIZE/2048+1; i++){
     writeaudio(buf, 2048);
   }*/
-  printf(0, "proc %d is playing...\n", getpid());
+  // printf(0, "proc %d is playing...\n", getpid());
   while (rd < info.dlen){
     read(fd, buf, (info.dlen - rd < 2048 ? info.dlen -rd : 2048));
-    //printf(0, "read pointer: %d, tot_len: %d\n", rd, info.dlen);
+    // printf(0, "read pointer: %d, tot_len: %d\n", rd, info.dlen);
     writeaudio(buf, (info.dlen - rd < 2048 ? info.dlen -rd : 2048));
     rd += (info.dlen - rd < 2048 ? info.dlen -rd : 2048);
   }
@@ -66,7 +74,7 @@ main(int argc, char *argv[])
   for (i = 0; i < DMA_BUF_NUM * DMA_BUF_SIZE/2048+1; i++){
     writeaudio(buf, 2048);
   }*/
-  printf(0, "proc %d finish playing...\n", getpid());
+  // printf(0, "proc %d finish playing...\n", getpid());
   close(fd);
 
   //kill(pid);  wait();

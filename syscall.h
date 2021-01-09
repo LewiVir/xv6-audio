@@ -27,3 +27,6 @@
 #define SYS_getppid 26
 #define SYS_getptable 27
 #define SYS_finishwrite 28
+#define SYS_audiostop 29
+#define SYS_setplaypid 30
+#define SYS_readplaypid 31

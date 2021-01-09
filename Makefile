@@ -180,6 +180,7 @@ UPROGS=\
 	_pause\
 	_setvolume\
 	_ps\
+	_stop\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS) tsinghua.wav twilight.wav

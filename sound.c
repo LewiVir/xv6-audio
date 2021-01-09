@@ -109,14 +109,14 @@ void soundinit(void)
             // find 0x24158086(Intel 82801
             if (vendor == 0x8086 && device == 0x2415)
             {
-                cprintf("Find sound card!\n");
+                // cprintf("Find sound card!\n");
                 // Init sound
                 soundcardinit((bus << 8) + (slot << 3) + func);
                 return;
             }
         }
     }
-	cprintf("Sound card not found!\n");
+	// cprintf("Sound card not found!\n");
 }
 
 void soundcardinit(uint addr)
@@ -130,42 +130,42 @@ void soundcardinit(uint addr)
 
 	SOUND_NAMBA_DATA = pciread(addr, PCI_CONFIG_SPACE_NAMBA) & (~0x1);
 	SOUND_NABMBA_DATA = pciread(addr, PCI_CONFIG_SPACE_NABMBA) & (~0x1);
-	cprintf("AUDIO I/O Space initialized successfully!\n");
+	// cprintf("AUDIO I/O Space initialized successfully!\n");
 	
 	//Removing AC_RESET
 	outb(SOUND_NABMBA_DATA + NABMBA_GLOB_CNT, 0x2);
-	cprintf("AC_RESET removed successfully!\n");
+	// cprintf("AC_RESET removed successfully!\n");
 	
 	//Reading Codec Ready Status
 	cur = 0;
-	cprintf("Waiting for Codec Ready Status...\n");
+	// cprintf("Waiting for Codec Ready Status...\n");
 	while (!(inw(SOUND_NABMBA_DATA + NABMBA_GLOB_STA) & 0X100) && cur < 1000)
 	{
 		cur++;
 	}
 	if (cur == 1000)
 	{
-		cprintf("\nAudio Init Failed\n");
+		// cprintf("\nAudio Init Failed\n");
 		return;
 	}
-	cprintf("Codec is ready!\n");
+	// cprintf("Codec is ready!\n");
 	
 	//Determine Audio Codec
 	tmp = inw(NAMBA_PCMV);
-	cprintf("%x\n", tmp);
+	// cprintf("%x\n", tmp);
 	outw(NAMBA_PCMV, 0x8000);
 	if (inw(NAMBA_PCMV) != 0x8000)
 	{
-		cprintf("Audio Codec Function not found!\n");
+		// cprintf("Audio Codec Function not found!\n");
 		return;
 	}
 	outw(NAMBA_PCMV, tmp);
-	cprintf("Audio Codec Function is found, current volume is %x.\n", tmp);
+	// cprintf("Audio Codec Function is found, current volume is %x.\n", tmp);
 	
 	//Reading the Audio Codec Vendor ID
 	vendorID1 = inw(SOUND_NAMBA_DATA + NAMBA_PCVID1);
 	vendorID2 = inw(SOUND_NAMBA_DATA + NAMBA_PCVID2);
-	cprintf("Audio Codec Vendor ID read successfully!\n");
+	// cprintf("Audio Codec Vendor ID read successfully!\n");
 	
 	//Programming the PCI Audio Subsystem ID
 	vendorID = (vendorID2 << 16) + vendorID1;
@@ -184,14 +184,14 @@ void soundcardinit(uint addr)
 void setVolume(ushort volume)
 {
   //NAMBA_PCMV --> volume
-  cprintf("setVolume\n");
+  cprintf("Volume: %d\n", volume);
   outw(NAMBA_PCMV, volume);
 }
 
 //add sound-piece to the end of queue
 void addSound(struct soundNode *node)//param is a pointer to soundNode
 {   
-    cprintf("addSound\n");
+    // cprintf("addSound\n");
     struct soundNode **ptr;
 
     acquire(&soundLock);
@@ -204,7 +204,7 @@ void addSound(struct soundNode *node)//param is a pointer to soundNode
     //node is already the first (i.e., soundQueue=0x00)
     //play sound
     if (soundQueue == node){
-        cprintf("addSound: soundQueue == node, so playSound()\n");
+        // cprintf("addSound: soundQueue == node, so playSound()\n");
         playSound();
     }
 
@@ -213,7 +213,7 @@ void addSound(struct soundNode *node)//param is a pointer to soundNode
 
 void playSound(void)
 {
-    cprintf("playSound\n");
+    // cprintf("playSound\n");
     int i;
 
     //遍历声卡DMA的描述符列表，初始化每一个描述符buf指向缓冲队列中第一个音乐的数据块
@@ -227,7 +227,7 @@ void playSound(void)
 
     //开始播放: PCM_OUT
     if ((soundQueue->flag & PCM_OUT) == PCM_OUT){
-        cprintf("PCM_OUT\n");
+        // cprintf("PCM_OUT\n");
         //init base register
         outsl(PO_BDBAR, &base, 1); //将内存地址base开始的1个双字写到PO_BDBAR
         //init last valid index
@@ -239,7 +239,7 @@ void playSound(void)
     }
     //开始录音: Mic_IN
     else if ((soundQueue->flag & PCM_IN) == PCM_IN) {//i.e., soundQueue->flag == PCM_IN
-        cprintf("PCM_IN\n");
+        // cprintf("PCM_IN\n");
         //init register
         outsl(MC_BDBAR, &base, 1); //将内存地址base开始的1个双字写到PO_BDBAR
         //init last valid index
@@ -253,7 +253,7 @@ void playSound(void)
 
 void soundInterrupt(void)
 {
-    cprintf("soundInterrupt\n");//once a soundNode finish playing, send an interrupt to CPU
+    // cprintf("soundInterrupt\n");//once a soundNode finish playing, send an interrupt to CPU
     int i;
 
     acquire(&soundLock);
@@ -277,7 +277,7 @@ void soundInterrupt(void)
             ushort sr = inw(MC_SR);
             outw(MC_SR, sr);
         }
-        cprintf("soundQueue empty.\n");//cprintf("Play Done\n");
+        // cprintf("soundQueue empty.\n");//cprintf("Play Done\n");
         release(&soundLock);
         return;
     }
@@ -305,19 +305,23 @@ void soundInterrupt(void)
 
 void pauseSound(void)
 {
-    cprintf("pauseSound\n");
+    
     // get Control Register
     uchar temp = inb(PO_CR);
 
-    if (temp != 0x00)
+    if (temp != 0x00){
+        cprintf("Paused.\n");
         outb(PO_CR, 0x00);
-    else    //temp == 0x00 means current state is stopped
+    }
+    else{    //temp == 0x00 means current state is stopped
+        cprintf("Resumed.\n");
         outb(PO_CR, 0x05);//make it start again
+    }
 }
 
 void setSoundSampleRate(uint samplerate)
 {
-    cprintf("setSoundSampleRate\n");
+    // cprintf("Audio Sample Rate: %d\n", samplerate);
     
     //pause audio
     //disable interrupt
@@ -329,4 +333,9 @@ void setSoundSampleRate(uint samplerate)
     outw(SURROUND_DAC_RATE, samplerate & 0xFFFF);
     //PCM LFE DAC Rate
     outw(LFE_DAC_RATE, samplerate & 0xFFFF);
+}
+
+void clearSound(void){
+    outb(PO_CR, 0x00);
+    soundQueue = 0;
 }
