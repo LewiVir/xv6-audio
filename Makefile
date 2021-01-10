@@ -182,6 +182,7 @@ UPROGS=\
 	_ps\
 	_stop\
 	_musiclist\
+	_resume\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS) tsinghua.wav twilight.wav

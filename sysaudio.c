@@ -73,7 +73,24 @@ int sys_setaudiovolume(void)
 int sys_audiopause(void)
 {
 	//cprintf("sys_audiopause\n");
-    pauseSound();
+    if(cur_pid != 0){
+        pauseSound();
+    }
+    else{
+        cprintf("Not playing.\n");
+    }
+    return 0;
+}
+
+int sys_audioresume(void)
+{
+	//cprintf("sys_audioresume\n");
+    if(cur_pid != 0){
+        resumeSound();
+    }
+    else{
+        cprintf("Not playing.\n");
+    }
     return 0;
 }
 

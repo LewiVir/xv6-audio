@@ -303,19 +303,47 @@ void soundInterrupt(void)
     release(&soundLock);
 }
 
+// void pauseSound(void)
+// {
+    
+//     // get Control Register
+//     uchar temp = inb(PO_CR);
+
+//     if (temp != 0x00){
+//         cprintf("Paused.\n");
+//         outb(PO_CR, 0x00);
+//     }
+//     else{    //temp == 0x00 means current state is stopped
+//         cprintf("Resumed.\n");
+//         outb(PO_CR, 0x05);//make it start again
+//     }
+// }
+
 void pauseSound(void)
 {
-    
     // get Control Register
     uchar temp = inb(PO_CR);
 
-    if (temp != 0x00){
+    if (temp == 0x05){
         cprintf("Paused.\n");
         outb(PO_CR, 0x00);
     }
     else{    //temp == 0x00 means current state is stopped
+        cprintf("Already paused.\n");
+    }
+}
+
+void resumeSound(void)
+{
+    // get Control Register
+    uchar temp = inb(PO_CR);
+
+    if (temp == 0x00){
         cprintf("Resumed.\n");
-        outb(PO_CR, 0x05);//make it start again
+        outb(PO_CR, 0x05);
+    }
+    else{
+        cprintf("Already playing.\n");
     }
 }
 

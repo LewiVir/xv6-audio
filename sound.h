@@ -59,5 +59,6 @@ void addSound(struct soundNode *node);
 void playSound(void);
 void soundInterrupt(void);
 void pauseSound(void);
+void resumeSound(void);
 void setSoundSampleRate(uint samplerate);
 void clearSound(void);

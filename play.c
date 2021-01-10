@@ -79,5 +79,6 @@ main(int argc, char *argv[])
 
   //kill(pid);  wait();
 
+  setplaypid(0);
   exit();
 }
