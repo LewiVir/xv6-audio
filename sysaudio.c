@@ -61,9 +61,15 @@ int sys_setaudiovolume(void)
     if (argint(0, &n) < 0)
         return -1;
 
-    volume = ((n & 0x3F) << 8) + (n & 0x3F);
+    if (n < 0 || n > 100){
+        cprintf("Valid volume value: 0-100\n");
+        return -1;
+    }
 
-    // cprintf("id");
+    cprintf("Volume: %d\n", n);
+
+    n = (int)((100.0 - (float)n) / 100.0 * 63.0);
+    volume = ((n & 0x3F) << 8) + (n & 0x3F);
 
     //audio.c设置音量
     setVolume(volume);

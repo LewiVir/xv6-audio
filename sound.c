@@ -176,7 +176,7 @@ void soundcardinit(uint addr)
 	picenable(IRQ_SOUND);
 	ioapicenable(IRQ_SOUND, ncpu - 1);	
 	
-	outw(NAMBA_PCMV, 0x1f1f);
+	outw(NAMBA_PCMV, 0x0000);
 
     soundQueue = 0;
 }
@@ -184,7 +184,6 @@ void soundcardinit(uint addr)
 void setVolume(ushort volume)
 {
   //NAMBA_PCMV --> volume
-  cprintf("Volume: %d\n", volume);
   outw(NAMBA_PCMV, volume);
 }
 

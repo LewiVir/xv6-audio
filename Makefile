@@ -185,7 +185,7 @@ UPROGS=\
 	_resume\
 
 fs.img: mkfs README $(UPROGS)
-	./mkfs fs.img README $(UPROGS) tsinghua.wav twilight.wav
+	./mkfs fs.img README $(UPROGS) 1.wav 2.wav 3.wav
 
 -include *.d
 
