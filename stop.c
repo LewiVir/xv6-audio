@@ -1,7 +1,7 @@
 #include "types.h"
 #include "user.h"
-int main()
-{
+
+int main(){
 	audiostop();
 	int running_pid = readplaypid();
 	if(running_pid > 0){

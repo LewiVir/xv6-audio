@@ -106,7 +106,7 @@ void soundinit(void)
         {
             vendor = res & 0xffff;
             device = (res >> 16) & 0xffff;
-            // find 0x24158086(Intel 82801
+            // find 0x24158086(Intel 82801)
             if (vendor == 0x8086 && device == 0x2415)
             {
                 // cprintf("Find sound card!\n");
@@ -196,8 +196,8 @@ void addSound(struct soundNode *node)//param is a pointer to soundNode
     acquire(&soundLock);
 
     node->next = 0;//because it is going to be added to the end of soundQueue
-    for(ptr = &soundQueue; *ptr; ptr = &(*ptr)->next)//locate ptr to the last node of soundQueue
-        ;
+    for(ptr = &soundQueue; *ptr; ptr = &(*ptr)->next);//locate ptr to the last node of soundQueue
+
     *ptr = node;//make node linked to the end
 
     //node is already the first (i.e., soundQueue=0x00)
@@ -268,7 +268,6 @@ void soundInterrupt(void)
     
     if (soundQueue == 0) {//0 sound file left
         if ((flag & PCM_OUT) == PCM_OUT){
-            //????
             ushort sr = inw(PO_SR);
             outw(PO_SR, sr);
         }
@@ -276,7 +275,7 @@ void soundInterrupt(void)
             ushort sr = inw(MC_SR);
             outw(MC_SR, sr);
         }
-        // cprintf("soundQueue empty.\n");//cprintf("Play Done\n");
+        // cprintf("soundQueue empty.\n");
         release(&soundLock);
         return;
     }
@@ -301,22 +300,6 @@ void soundInterrupt(void)
 
     release(&soundLock);
 }
-
-// void pauseSound(void)
-// {
-    
-//     // get Control Register
-//     uchar temp = inb(PO_CR);
-
-//     if (temp != 0x00){
-//         cprintf("Paused.\n");
-//         outb(PO_CR, 0x00);
-//     }
-//     else{    //temp == 0x00 means current state is stopped
-//         cprintf("Resumed.\n");
-//         outb(PO_CR, 0x05);//make it start again
-//     }
-// }
 
 void pauseSound(void)
 {
